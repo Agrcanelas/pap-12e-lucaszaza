@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Secure Systems | Plataforma de Testes</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    /* Paleta de cores */
+    :root {
+      --bg-dark: #0d1117;
+      --primary: #161b22;
+      --secondary: #21262d;
+      --accent: #58a6ff;
+      --text: #f0f6fc;
+      --text-muted: #8b949e;
+    }
+
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-dark);
+      color: var(--text);
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: var(--primary);
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 2rem;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .nav-links a {
+      color: var(--text);
+      text-decoration: none;
+      transition: 0.3s;
+      font-weight: 500;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+
+    /* Hero */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      min-height: 100vh;
+      padding: 0 2rem;
+    }
+
+    .hero h1 {
+      font-size: 3.2rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      max-width: 600px;
+    }
+
+    /* Botões */
+    .buttons {
+      margin-top: 2.5rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      background-color: var(--accent);
+      color: var(--text);
+      padding: 0.9rem 2rem;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px rgba(88, 166, 255, 0.2);
+    }
+
+    .btn:hover {
+      background-color: #1f6feb;
+      box-shadow: 0 0 20px rgba(88, 166, 255, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background-color: var(--secondary);
+      border: 1px solid #30363d;
+    }
+
+    .btn-secondary:hover {
+      background-color: #30363d;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .hero h1 {
+        font-size: 2.3rem;
+      }
+
+      .buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">🔒 Secure Systems</div>
+    <ul class="nav-links">
+      <li><a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+      <li><a href="registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <h1>Bem-vindo à Secure Systems</h1>
+    <p>Testes de vulnerabilidade automatizados com relatórios claros e confiáveis.</p>
+    <div class="buttons">
+      <a href="registro.php" class="btn">🚀 Criar Conta</a>
+      <a href="login.php" class="btn btn-secondary">🔑 Entrar</a>
+    </div>
+  </section>
+</body>
+</html>
