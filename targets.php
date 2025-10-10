@@ -2,7 +2,11 @@
 session_start();
 include 'conexao.php';
 
+<<<<<<< HEAD
 // Verifica se usuário está logado
+=======
+// Verifica se o usuário está logado
+>>>>>>> 16e81cb (CODIGO FUNCIONANDOOOOO)
 if (!isset($_SESSION['usuario_id'])) {
     header("Location: login.php");
     exit();
@@ -11,7 +15,11 @@ if (!isset($_SESSION['usuario_id'])) {
 $usuario_id = $_SESSION['usuario_id'];
 $mensagem = "";
 
+<<<<<<< HEAD
 // Descobre automaticamente qual coluna da tabela targets é URL/IP
+=======
+// Descobre a coluna de URL/IP da tabela targets
+>>>>>>> 16e81cb (CODIGO FUNCIONANDOOOOO)
 $colUrl = null;
 $stmt = $pdo->query("DESCRIBE targets");
 $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -29,6 +37,7 @@ if (!$colUrl) {
 if (isset($_POST['adicionar'])) {
     $novo_target = trim($_POST['novo_target']);
     if (!empty($novo_target)) {
+<<<<<<< HEAD
         $stmtInsert = $pdo->prepare("INSERT INTO targets (usuario_id, `$colUrl`, data_adicionado) VALUES (?, ?, NOW())");
         if ($stmtInsert->execute([$usuario_id, $novo_target])) {
             // Pega o ID do target recém-criado
@@ -36,6 +45,12 @@ if (isset($_POST['adicionar'])) {
 
             // Redireciona para scans.php com o target já selecionado
             header("Location: targets.php?target_id=" . $novo_id);
+=======
+        $stmtInsert = $pdo->prepare("INSERT INTO targets (usuario_id, `$colUrl`, nome, endereco, data_adicionado) VALUES (?, ?, '', '', NOW())");
+        if ($stmtInsert->execute([$usuario_id, $novo_target])) {
+            $novo_id = $pdo->lastInsertId();
+            header("Location: scans.php?target_id=" . $novo_id);
+>>>>>>> 16e81cb (CODIGO FUNCIONANDOOOOO)
             exit();
         } else {
             $mensagem = "<p class='error'>❌ Erro ao adicionar target.</p>";
@@ -45,7 +60,10 @@ if (isset($_POST['adicionar'])) {
     }
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 16e81cb (CODIGO FUNCIONANDOOOOO)
 // Remover target
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
@@ -57,11 +75,20 @@ if (isset($_GET['delete'])) {
     }
 }
 
+<<<<<<< HEAD
 // Buscar targets do usuário
+=======
+// Buscar targets
+>>>>>>> 16e81cb (CODIGO FUNCIONANDOOOOO)
 $stmtTargets = $pdo->prepare("SELECT id, `$colUrl` AS target, data_adicionado FROM targets WHERE usuario_id = ? ORDER BY data_adicionado DESC");
 $stmtTargets->execute([$usuario_id]);
 $targets = $stmtTargets->fetchAll(PDO::FETCH_ASSOC);
 ?>
+<<<<<<< HEAD
+=======
+<!-- (restante do HTML idêntico ao seu, pode manter o mesmo) -->
+
+>>>>>>> 16e81cb (CODIGO FUNCIONANDOOOOO)
 
 
 <!DOCTYPE html>
