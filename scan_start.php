@@ -27,7 +27,7 @@ echo "<h3>Scan iniciado para $target (ID $scanId)</h3>";
 do {
     sleep(5);
     $status = file_get_contents("$zapApiUrl/JSON/ascan/view/status/?scanId=$scanId");
-    $status = json_decode($status, true)['status'];
+    $status = json_decode($status, associative: true)['status'];
     echo "Progresso: $status%<br>";
     ob_flush(); flush();
 } while ($status < 100);

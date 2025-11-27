@@ -4,20 +4,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Secure Systems | Plataforma de Testes</title>
+  <title>Secure Systems | Plataforma de Testes de Segurança</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    /* Paleta de cores */
     :root {
       --bg-dark: #0d1117;
       --primary: #161b22;
       --secondary: #21262d;
       --accent: #58a6ff;
+      --accent-hover: #1f6feb;
+      --green: #3fb950;
       --text: #f0f6fc;
       --text-muted: #8b949e;
+      --border: #30363d;
     }
 
-    /* Reset */
     * {
       margin: 0;
       padding: 0;
@@ -25,50 +26,95 @@
     }
 
     body {
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: var(--bg-dark);
       color: var(--text);
+      overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .bg-animation::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(88, 166, 255, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(100px, 100px); }
     }
 
     /* Navbar */
     .navbar {
-      background-color: var(--primary);
-      border-bottom: 1px solid #30363d;
+      background-color: rgba(22, 27, 34, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 2rem;
+      padding: 1.2rem 5%;
       position: fixed;
       width: 100%;
       top: 0;
       z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
     .logo {
-      font-size: 1.5rem;
+      font-size: 1.8rem;
       font-weight: bold;
       color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.3s;
+    }
+
+    .logo:hover {
+      transform: scale(1.05);
     }
 
     .nav-links {
       list-style: none;
       display: flex;
-      gap: 2rem;
+      gap: 2.5rem;
+      align-items: center;
     }
 
     .nav-links a {
       color: var(--text);
       text-decoration: none;
-      transition: 0.3s;
-      font-weight: 500;
+      transition: all 0.3s;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     .nav-links a:hover {
       color: var(--accent);
-      text-decoration: underline;
+      background-color: rgba(88, 166, 255, 0.1);
     }
 
-    /* Hero */
+    /* Hero Section */
     .hero {
       display: flex;
       flex-direction: column;
@@ -76,93 +122,471 @@
       align-items: center;
       text-align: center;
       min-height: 100vh;
-      padding: 0 2rem;
+      padding: 6rem 5% 4rem;
+      position: relative;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(88, 166, 255, 0.2) 0%, rgba(31, 111, 235, 0.2) 100%);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 2rem;
+      animation: pulse 3s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
     }
 
     .hero h1 {
-      font-size: 3.2rem;
-      margin-bottom: 1rem;
-      color: var(--accent);
+      font-size: 4rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--green) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
     }
 
-    .hero p {
-      font-size: 1.2rem;
+    .hero-subtitle {
+      font-size: 1.4rem;
       color: var(--text-muted);
-      max-width: 600px;
+      max-width: 700px;
+      margin: 0 auto 3rem;
+      line-height: 1.6;
     }
 
-    /* Botões */
     .buttons {
-      margin-top: 2.5rem;
       display: flex;
-      gap: 1rem;
+      gap: 1.5rem;
+      justify-content: center;
+      flex-wrap: wrap;
     }
 
     .btn {
-      background-color: var(--accent);
-      color: var(--text);
-      padding: 0.9rem 2rem;
+      padding: 1rem 2.5rem;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       text-decoration: none;
       font-weight: bold;
-      font-size: 1rem;
+      font-size: 1.1rem;
       transition: all 0.3s ease;
-      box-shadow: 0 0 10px rgba(88, 166, 255, 0.2);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .btn:hover {
-      background-color: #1f6feb;
-      box-shadow: 0 0 20px rgba(88, 166, 255, 0.5);
-      transform: translateY(-2px);
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+      color: var(--text);
+      box-shadow: 0 5px 20px rgba(88, 166, 255, 0.4);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(88, 166, 255, 0.6);
     }
 
     .btn-secondary {
-      background-color: var(--secondary);
-      border: 1px solid #30363d;
+      background-color: transparent;
+      border: 2px solid var(--border);
+      color: var(--text);
     }
 
     .btn-secondary:hover {
-      background-color: #30363d;
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+      border-color: var(--accent);
+      background-color: rgba(88, 166, 255, 0.1);
+      transform: translateY(-3px);
+    }
+
+    /* Features Section */
+    .features {
+      padding: 6rem 5%;
+      background: linear-gradient(180deg, var(--bg-dark) 0%, var(--primary) 100%);
+    }
+
+    .features-header {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+
+    .features-header h2 {
+      font-size: 2.5rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .features-header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .feature-card {
+      background: var(--primary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--green) 100%);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      border-color: var(--accent);
+      box-shadow: 0 10px 40px rgba(88, 166, 255, 0.2);
+    }
+
+    .feature-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1.5rem;
+      display: inline-block;
+    }
+
+    .feature-card h3 {
+      font-size: 1.5rem;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .feature-card p {
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Stats Section */
+    .stats {
+      padding: 5rem 5%;
+      background-color: var(--primary);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .stat-card {
+      text-align: center;
+      padding: 2rem;
+      background: var(--secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: scale(1.05);
+      border-color: var(--accent);
+    }
+
+    .stat-number {
+      font-size: 3rem;
+      font-weight: bold;
+      color: var(--green);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    /* Footer */
+    .footer {
+      background-color: var(--primary);
+      border-top: 1px solid var(--border);
+      padding: 3rem 5%;
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    .footer-text {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Mobile Menu */
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
     }
 
     /* Responsividade */
     @media (max-width: 768px) {
       .hero h1 {
-        font-size: 2.3rem;
+        font-size: 2.5rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1.1rem;
       }
 
       .buttons {
         flex-direction: column;
+        width: 100%;
       }
 
       .btn {
         width: 100%;
-        text-align: center;
+        justify-content: center;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 
 <body>
+  <!-- Background Animation -->
+  <div class="bg-animation"></div>
+
   <!-- Navbar -->
   <nav class="navbar">
-    <div class="logo">🔒 Secure Systems</div>
+    <div class="logo">
+      <i class="fas fa-shield-alt"></i>
+      <span>Secure Systems</span>
+    </div>
     <ul class="nav-links">
+      <li><a href="#features"><i class="fas fa-star"></i> Funcionalidades</a></li>
       <li><a href="login.php"><i class="fas fa-sign-in-alt"></i> Login</a></li>
       <li><a href="registro.php"><i class="fas fa-user-plus"></i> Registrar</a></li>
     </ul>
+    <button class="mobile-menu-btn">
+      <i class="fas fa-bars"></i>
+    </button>
   </nav>
 
-  <!-- Hero -->
+  <!-- Hero Section -->
   <section class="hero">
-    <h1>Bem-vindo à Secure Systems</h1>
-    <p>Testes de vulnerabilidade automatizados com relatórios claros e confiáveis.</p>
-    <div class="buttons">
-      <a href="registro.php" class="btn">🚀 Criar Conta</a>
-      <a href="login.php" class="btn btn-secondary">🔑 Entrar</a>
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-bolt"></i> Plataforma Profissional de Cibersegurança
+      </div>
+      <h1>Proteja Seus Sistemas com Secure Systems</h1>
+      <p class="hero-subtitle">
+        Detecte vulnerabilidades antes que hackers o façam. Testes automatizados com OWASP ZAP, 
+        relatórios detalhados e monitoramento contínuo da sua infraestrutura.
+      </p>
+      <div class="buttons">
+        <a href="registro.php" class="btn btn-primary">
+          <span><i class="fas fa-rocket"></i> Começar Gratuitamente</span>
+        </a>
+        <a href="login.php" class="btn btn-secondary">
+          <span><i class="fas fa-sign-in-alt"></i> Entrar na Plataforma</span>
+        </a>
+      </div>
     </div>
   </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="features-header">
+      <h2>Por que escolher a Secure Systems?</h2>
+      <p>Ferramentas profissionais para segurança da informação</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Scans Automatizados</h3>
+        <p>Execute testes de vulnerabilidade completos com OWASP ZAP integrado. Spider inteligente e Active Scan profissional.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Relatórios Detalhados</h3>
+        <p>Visualize vulnerabilidades encontradas com classificação de severidade, CVE, CWE e scores de risco automatizados.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Gestão de Targets</h3>
+        <p>Organize e monitore múltiplos alvos (URLs/IPs) com histórico completo de scans e métricas de segurança.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📈</div>
+        <h3>Dashboard Inteligente</h3>
+        <p>Acompanhe estatísticas em tempo real, vulnerabilidades críticas e evolução da segurança dos seus sistemas.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔐</div>
+        <h3>Segurança Garantida</h3>
+        <p>Dados criptografados, autenticação segura e logs de auditoria completos para compliance e rastreabilidade.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Resultados Rápidos</h3>
+        <p>Análises otimizadas que entregam resultados em minutos, permitindo correções ágeis de vulnerabilidades.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">1000+</div>
+        <div class="stat-label">Scans Realizados</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">500+</div>
+        <div class="stat-label">Vulnerabilidades Detectadas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">99.9%</div>
+        <div class="stat-label">Taxa de Precisão</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">24/7</div>
+        <div class="stat-label">Monitoramento</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-links">
+        <a href="#"><i class="fas fa-book"></i> Documentação</a>
+        <a href="#"><i class="fas fa-question-circle"></i> Suporte</a>
+        <a href="#"><i class="fas fa-shield-alt"></i> Política de Privacidade</a>
+        <a href="#"><i class="fas fa-file-contract"></i> Termos de Uso</a>
+      </div>
+      <p class="footer-text">
+        © 2025 Secure Systems | Desenvolvido para TCC de Cibersegurança<br>
+        Plataforma de Testes de Vulnerabilidade Automatizados
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Mobile menu toggle (básico)
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navLinks = document.querySelector('.nav-links');
+    
+    mobileMenuBtn?.addEventListener('click', () => {
+      navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+    });
+  </script>
+
 </body>
 </html>

@@ -8,147 +8,425 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 $id = $_SESSION['usuario_id'];
+$mensagem = '';
+$mensagem_tipo = '';
 
 // Atualiza os dados se o formulário foi enviado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nome = $_POST['nome_completo'];
-    $email = $_POST['email'];
+    $nome = trim($_POST['nome_completo']);
+    $email = trim($_POST['email']);
     $data_nasc = $_POST['data_nascimento'];
-    $cidade = $_POST['cidade'];
-
-    $sql = "UPDATE usuarios SET nome_completo = :nome, email = :email, data_nascimento = :data, cidade = :cidade WHERE id = :id";
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([
-        ':nome' => $nome,
-        ':email' => $email,
-        ':data' => $data_nasc,
-        ':cidade' => $cidade,
-        ':id' => $id
-    ]);
-
-    header("Location: perfil.php");
-    exit;
+    $cidade = trim($_POST['cidade']);
+    
+    // Validações
+    if (empty($nome) || empty($email) || empty($cidade)) {
+        $mensagem = "❌ Todos os campos são obrigatórios!";
+        $mensagem_tipo = "danger";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $mensagem = "❌ Email inválido!";
+        $mensagem_tipo = "danger";
+    } else {
+        try {
+            // Verifica se o email já existe para outro usuário
+            $stmt = $pdo->prepare("SELECT id FROM usuarios WHERE email = ? AND id != ?");
+            $stmt->execute([$email, $id]);
+            
+            if ($stmt->fetch()) {
+                $mensagem = "❌ Este email já está em uso por outro usuário!";
+                $mensagem_tipo = "danger";
+            } else {
+                // Atualiza os dados
+                $sql = "UPDATE usuarios SET nome_completo = ?, email = ?, data_nascimento = ?, cidade = ? WHERE id = ?";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([$nome, $email, $data_nasc, $cidade, $id]);
+                
+                // Registra log
+                $stmtLog = $pdo->prepare("INSERT INTO logs (usuario_id, acao, detalhes, criado_em) VALUES (?, 'perfil_atualizado', ?, NOW())");
+                $stmtLog->execute([$id, json_encode(['nome' => $nome, 'email' => $email])]);
+                
+                $mensagem = "✅ Perfil atualizado com sucesso!";
+                $mensagem_tipo = "success";
+                
+                // Aguarda 1 segundo e redireciona
+                header("refresh:1;url=perfil.php");
+            }
+        } catch (Exception $e) {
+            $mensagem = "❌ Erro ao atualizar: " . $e->getMessage();
+            $mensagem_tipo = "danger";
+        }
+    }
 }
 
 // Busca os dados atuais
-$stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = :id");
-$stmt->execute([':id' => $id]);
+$stmt = $pdo->prepare("SELECT * FROM usuarios WHERE id = ?");
+$stmt->execute([$id]);
 $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>Editar Perfil</title>
-  <style>
-    body {
-      background-color: #121212;
-      color: #e0e0e0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .card {
-      background-color: #1e1e1e;
-      padding: 30px 40px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-      width: 100%;
-      max-width: 400px;
-      box-sizing: border-box;
-    }
-
-    h2 {
-      color: #ffffff;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
-      text-align: center;
-      font-size: 1.5em;
-    }
-
-    label {
-      display: block;
-      margin: 15px 0 5px;
-      font-weight: bold;
-      color: #90caf9;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      border: none;
-      border-radius: 6px;
-      background-color: #2c2c2c;
-      color: #e0e0e0;
-      font-size: 1em;
-      box-sizing: border-box;
-    }
-
-    input:focus {
-      outline: none;
-      border: 1px solid #64b5f6;
-      background-color: #333;
-    }
-
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 12px;
-      margin-top: 15px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1em;
-      text-align: center;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      text-decoration: none;
-      box-sizing: border-box;
-    }
-
-    .btn-save {
-      background-color: #43a047;
-      color: white;
-    }
-
-    .btn-save:hover {
-      background-color: #388e3c;
-    }
-
-    .btn-back {
-      background-color: #2c2c2c;
-      color: #e0e0e0;
-    }
-
-    .btn-back:hover {
-      background-color: #1b1b1b;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editar Perfil - Secure Systems</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #f0f6fc;
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+        .navbar {
+            background-color: #161b22;
+            border-bottom: 1px solid #30363d;
+        }
+        .navbar-brand {
+            font-weight: bold;
+            color: #58a6ff !important;
+        }
+        .edit-container {
+            max-width: 700px;
+            margin: 50px auto;
+        }
+        .edit-card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .edit-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .edit-header h3 {
+            color: #58a6ff;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .edit-header p {
+            color: #8b949e;
+            font-size: 0.95rem;
+        }
+        .avatar-edit {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #1f6feb 0%, #58a6ff 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 20px;
+            border: 3px solid #30363d;
+        }
+        .form-label {
+            color: #8b949e;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-control {
+            background-color: #0d1117;
+            border: 2px solid #30363d;
+            color: #f0f6fc;
+            padding: 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .form-control:focus {
+            background-color: #0d1117;
+            border-color: #58a6ff;
+            color: #f0f6fc;
+            box-shadow: 0 0 0 0.25rem rgba(88, 166, 255, 0.25);
+        }
+        .form-control::placeholder {
+            color: #484f58;
+        }
+        .btn-custom {
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            border: none;
+        }
+        .btn-save {
+            background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+            color: white;
+        }
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(46, 160, 67, 0.4);
+        }
+        .btn-cancel {
+            background-color: #30363d;
+            color: #f0f6fc;
+        }
+        .btn-cancel:hover {
+            background-color: #484f58;
+            transform: translateY(-2px);
+        }
+        .alert-custom {
+            border-radius: 8px;
+            border: none;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+        }
+        .info-box {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .info-box-title {
+            color: #58a6ff;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .info-box-text {
+            color: #8b949e;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .input-icon {
+            font-size: 1.2rem;
+        }
+        .required {
+            color: #ff5555;
+        }
+    </style>
 </head>
 <body>
-  <div class="card">
-    <h2>Editar Perfil</h2>
-    <form method="POST">
-      <label>Nome completo:</label>
-      <input type="text" name="nome_completo" value="<?= htmlspecialchars($usuario['nome_completo']) ?>">
 
-      <label>Email:</label>
-      <input type="email" name="email" value="<?= htmlspecialchars($usuario['email']) ?>">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark px-4 py-3">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="home.php">🔒 Secure Systems</a>
+            <div class="d-flex align-items-center gap-3 ms-auto">
+                <span class="text-light">👤 <?= htmlspecialchars($_SESSION['username']) ?></span>
+                <a href="perfil.php" class="btn btn-outline-info btn-sm">← Voltar</a>
+                <a href="logout.php" class="btn btn-outline-danger btn-sm">Sair</a>
+            </div>
+        </div>
+    </nav>
 
-      <label>Data de nascimento:</label>
-      <input type="date" name="data_nascimento" value="<?= htmlspecialchars($usuario['data_nascimento']) ?>">
+    <div class="edit-container">
+        <div class="edit-card">
+            
+            <!-- Header -->
+            <div class="edit-header">
+                <div class="avatar-edit">
+                    <?= strtoupper(substr($usuario['nome_completo'], 0, 1)) ?>
+                </div>
+                <h3>✏️ Editar Perfil</h3>
+                <p>Atualize suas informações pessoais</p>
+            </div>
 
-      <label>Cidade:</label>
-      <input type="text" name="cidade" value="<?= htmlspecialchars($usuario['cidade']) ?>">
+            <!-- Mensagem -->
+            <?php if ($mensagem): ?>
+                <div class="alert alert-<?= $mensagem_tipo ?> alert-custom">
+                    <?= $mensagem ?>
+                </div>
+            <?php endif; ?>
 
-      <button type="submit" class="btn btn-save">Salvar Alterações</button>
-      <a href="perfil.php" class="btn btn-back">Voltar</a>
-    </form>
-  </div>
+            <!-- Info Box -->
+            <div class="info-box">
+                <div class="info-box-title">
+                    ℹ️ Informações Importantes
+                </div>
+                <div class="info-box-text">
+                    • Seu <strong>username</strong> não pode ser alterado<br>
+                    • Use um email válido para recuperação de conta<br>
+                    • Todos os campos marcados com <span class="required">*</span> são obrigatórios
+                </div>
+            </div>
+
+            <!-- Formulário -->
+            <form method="POST">
+                
+                <!-- Nome Completo -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <span class="input-icon">👤</span>
+                        Nome Completo <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="nome_completo" 
+                        class="form-control" 
+                        value="<?= htmlspecialchars($usuario['nome_completo']) ?>"
+                        placeholder="Digite seu nome completo"
+                        required
+                    >
+                </div>
+
+                <!-- Email -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <span class="input-icon">📧</span>
+                        Email <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        class="form-control" 
+                        value="<?= htmlspecialchars($usuario['email']) ?>"
+                        placeholder="seu@email.com"
+                        required
+                    >
+                </div>
+
+                <!-- Data de Nascimento -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <span class="input-icon">🎂</span>
+                        Data de Nascimento <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="date" 
+                        name="data_nascimento" 
+                        class="form-control" 
+                        value="<?= htmlspecialchars($usuario['data_nascimento']) ?>"
+                        required
+                    >
+                </div>
+
+                <!-- Cidade -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <span class="input-icon">📍</span>
+                        Cidade <span class="required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        name="cidade" 
+                        class="form-control" 
+                        value="<?= htmlspecialchars($usuario['cidade']) ?>"
+                        placeholder="Digite sua cidade"
+                        required
+                    >
+                </div>
+
+                <!-- Username (Somente Leitura) -->
+                <div class="mb-4">
+                    <label class="form-label">
+                        <span class="input-icon">🔑</span>
+                        Username (não editável)
+                    </label>
+                    <input 
+                        type="text" 
+                        class="form-control" 
+                        value="@<?= htmlspecialchars($usuario['username']) ?>"
+                        disabled
+                        style="cursor: not-allowed; opacity: 0.6;"
+                    >
+                </div>
+
+                <!-- Botões -->
+                <div class="row g-3 mt-4">
+                    <div class="col-md-6">
+                        <button type="submit" class="btn btn-custom btn-save w-100">
+                            💾 Salvar Alterações
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="perfil.php" class="btn btn-custom btn-cancel w-100">
+                            ← Cancelar
+                        </a>
+                    </div>
+                </div>
+
+            </form>
+
+            <!-- Informações Adicionais -->
+            <div class="mt-4 pt-4" style="border-top: 1px solid #30363d;">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div style="text-align: center; padding: 15px; background: #0d1117; border-radius: 8px;">
+                            <div style="font-size: 0.85rem; color: #8b949e; margin-bottom: 5px;">Membro desde</div>
+                            <div style="font-weight: 600; color: #58a6ff;">
+                                <?php
+                                // Você pode adicionar uma coluna created_at na tabela usuarios
+                                // Por enquanto, vamos usar a data de nascimento como exemplo
+                                echo date('d/m/Y');
+                                ?>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div style="text-align: center; padding: 15px; background: #0d1117; border-radius: 8px;">
+                            <div style="font-size: 0.85rem; color: #8b949e; margin-bottom: 5px;">Última atualização</div>
+                            <div style="font-weight: 600; color: #58a6ff;">Agora</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Links Adicionais -->
+        <div class="text-center mt-4">
+            <p style="color: #8b949e; font-size: 0.9rem;">
+                Precisa alterar sua senha? 
+                <a href="site_config.php" style="color: #58a6ff; text-decoration: none; font-weight: 600;">
+                    Acesse as Configurações →
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Validação adicional no cliente
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const nome = document.querySelector('[name="nome_completo"]').value.trim();
+            const email = document.querySelector('[name="email"]').value.trim();
+            const cidade = document.querySelector('[name="cidade"]').value.trim();
+            
+            if (nome.length < 3) {
+                e.preventDefault();
+                alert('❌ O nome deve ter pelo menos 3 caracteres!');
+                return;
+            }
+            
+            if (!email.includes('@') || !email.includes('.')) {
+                e.preventDefault();
+                alert('❌ Email inválido!');
+                return;
+            }
+            
+            if (cidade.length < 2) {
+                e.preventDefault();
+                alert('❌ Nome da cidade muito curto!');
+                return;
+            }
+        });
+        
+        // Confirmação antes de sair se houver alterações
+        let formModificado = false;
+        document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"]').forEach(input => {
+            input.addEventListener('input', function() {
+                formModificado = true;
+            });
+        });
+        
+        document.querySelector('.btn-cancel').addEventListener('click', function(e) {
+            if (formModificado) {
+                if (!confirm('Você tem alterações não salvas. Deseja realmente sair?')) {
+                    e.preventDefault();
+                }
+            }
+        });
+    </script>
+
 </body>
 </html>
-
