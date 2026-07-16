@@ -7,6 +7,7 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
+
 $id = $_SESSION['usuario_id'];
 $mensagem = '';
 $mensagem_tipo = '';
