@@ -4,6 +4,10 @@ include 'conexao.php'; // já conecta com PDO
 
 $erro = "";
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9833c72 (teste)
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $senha = $_POST['senha'];
